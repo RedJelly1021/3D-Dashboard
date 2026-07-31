@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Linq;
 
 public class DetailPanelUI : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class DetailPanelUI : MonoBehaviour
     public TMP_Text zoneIdText;
     public TMP_Text valueText;
     public TMP_Text statusText;
+    public MiniHistoryGraph historyGraph;
 
     private Zone _currentZone; // ref to zone currently displayed panel
 
@@ -36,6 +38,12 @@ public class DetailPanelUI : MonoBehaviour
         zoneIdText.text = $"구역 : {_currentZone.zoneId}";
         valueText.text = $"현재값: {_currentZone.currentValue:F1}";
         statusText.text = $"상태: {_currentZone.currentStatus}";
+
+        if (_currentZone.recentHistory.Count > 0)
+        {
+            float[] values = _currentZone.recentHistory.ToArray();
+            historyGraph.Draw(values, 0f, 40f); // mock data range min/max
+        }
     }
 
     public void ClosePanel()

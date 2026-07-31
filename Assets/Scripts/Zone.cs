@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public enum ZoneStatus { Normal, Warning, Critical }
 
@@ -8,6 +9,9 @@ public class Zone : MonoBehaviour
     public string zoneId;
     public ZoneStatus currentStatus = ZoneStatus.Normal;
     public float currentValue; // temperature or electric value
+
+    public Queue<float> recentHistory = new Queue<float>();
+    public const int MaxHistoryCount = 30; // only last 30 data points
 
     private Renderer _renderer;
     /*
@@ -34,10 +38,12 @@ public class Zone : MonoBehaviour
         currentStatus = status;
         ApplyColor();
 
-        if(enteringCritical)
-        {
+        recentHistory.Enqueue(value);
+        if (recentHistory.Count > MaxHistoryCount)
+            recentHistory.Dequeue();
+
+        if (enteringCritical)
             CriticalLogUI.Instance.AddEntry(zoneId, status, value);
-        }
     }
 
     private void ApplyColor()
