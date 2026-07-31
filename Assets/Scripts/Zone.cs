@@ -43,7 +43,10 @@ public class Zone : MonoBehaviour
             recentHistory.Dequeue();
 
         if (enteringCritical)
+        {
             CriticalLogUI.Instance.AddEntry(zoneId, status, value);
+            ToastUI.Instance.ShowToast(zoneId, status, value);
+        }
     }
 
     private void ApplyColor()
