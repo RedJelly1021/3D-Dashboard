@@ -9,6 +9,7 @@ public class ZoneListUI : MonoBehaviour
     public GameObject listItemPrefab; // ZoneListItem Prefab
     public TMP_InputField searchInput;
 
+    private ZoneStatus? _statusFilter = null; // If null, display All
     private string _searchKeyword = "";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -21,6 +22,12 @@ public class ZoneListUI : MonoBehaviour
         RefreshList();
     }
 
+    // methods to connnected th filter button
+    public void SetFilter(ZoneStatus? status)
+    {
+        _statusFilter = status;
+        RefreshList();
+    }
 
     void OnSearchChanged(string keyword)
     {
@@ -30,9 +37,18 @@ public class ZoneListUI : MonoBehaviour
 
     void RefreshList()
     {
-        var sortedZones = ZoneManager.Instance.Zones.OrderBy(z => z.zoneId).ToList();
+        // Clear existing items
+        foreach (Transform child in listContainer)
+            Destroy(child.gameObject);
 
-        foreach(var zone in sortedZones)
+        // Filter, Search and Sort
+        var filtered = ZoneManager.Instance.Zones
+            .Where(z => _statusFilter == null || z.currentStatus == _statusFilter)
+            .Where(z => string.IsNullOrEmpty(_searchKeyword) || z.zoneId.ToLower().Contains(_searchKeyword.ToLower()))
+            .OrderBy(z => z.zoneId)
+            .ToList();
+
+        foreach(var zone in filtered)
         {
             GameObject item = Instantiate(listItemPrefab, listContainer);
             TMP_Text label = item.GetComponentInChildren<TMP_Text>();
