@@ -7,14 +7,28 @@ public class ZoneListUI : MonoBehaviour
 {
     public Transform listContainer; // Scroll View Content
     public GameObject listItemPrefab; // ZoneListItem Prefab
+    public TMP_InputField searchInput;
+
+    private string _searchKeyword = "";
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        PopulateList();
+        if (searchInput != null)
+        {
+            searchInput.onValueChanged.AddListener(OnSearchChanged);
+        }
+        RefreshList();
     }
 
-    void PopulateList()
+
+    void OnSearchChanged(string keyword)
+    {
+        _searchKeyword = keyword;
+        RefreshList();
+    }
+
+    void RefreshList()
     {
         var sortedZones = ZoneManager.Instance.Zones.OrderBy(z => z.zoneId).ToList();
 
