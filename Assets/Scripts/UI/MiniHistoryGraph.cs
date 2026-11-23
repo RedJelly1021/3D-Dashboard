@@ -22,7 +22,7 @@ public class MiniHistoryGraph : MonoBehaviour
     {
         // background init
         Color[] pixels = new Color[textureWidth * textureHeight];
-        for (int i = 0; i < pixels.Length; i++) 
+        for (int i = 0; i < pixels.Length; i++)
         {
             pixels[i] = backgroundColor;
         }
@@ -35,14 +35,16 @@ public class MiniHistoryGraph : MonoBehaviour
         }
 
         float range = Mathf.Max(maxValue - minValue, 0.01f); // prevent division by zero
-
         // TODO : 어떻게 그리는건지 공부하기
+        float graphHeight = textureHeight / 3f;
+        float yOffset = (textureHeight - graphHeight) / 2f; // 중앙 정렬
+
         for (int i = 0; i < values.Length - 1; i++)
         {
             int x0 = Mathf.RoundToInt((float)i / (values.Length - 1) * (textureWidth - 1));
             int x1 = Mathf.RoundToInt((float)(i + 1) / (values.Length - 1) * (textureWidth - 1));
-            int y0 = Mathf.RoundToInt((values[i] - minValue) / range * (textureHeight - 1));
-            int y1 = Mathf.RoundToInt((values[i + 1] - minValue) / range * (textureHeight - 1));
+            int y0 = Mathf.RoundToInt(((values[i] - minValue) / range) * (graphHeight - 1) + yOffset);
+            int y1 = Mathf.RoundToInt(((values[i + 1] - minValue) / range) * (graphHeight - 1) + yOffset);
 
             DrawLine(x0, y0, x1, y1);
         }
