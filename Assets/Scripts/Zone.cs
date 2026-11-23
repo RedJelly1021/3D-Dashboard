@@ -13,6 +13,8 @@ public class Zone : MonoBehaviour
     public Queue<float> recentHistory = new Queue<float>();
     public const int MaxHistoryCount = 30; // only last 30 data points
 
+    public WorldLabel label;
+
     private Renderer _renderer;
     /*
     * Why use Material Property Block
@@ -27,6 +29,12 @@ public class Zone : MonoBehaviour
         _mpb = new MaterialPropertyBlock();
         if (string.IsNullOrEmpty(zoneId))
             zoneId = gameObject.name;
+    }
+
+    private void Start()
+    {
+        if (label != null)
+            label.SetText(zoneId);
     }
 
     public void UpdateStatus(float value, ZoneStatus status)
