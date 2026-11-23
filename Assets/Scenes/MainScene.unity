@@ -804,6 +804,8 @@ MonoBehaviour:
   defaultDistance: 30
   focusDistance: 8
   transitionDuration: 1
+  panSpeed: 0.02
+  dragThreshold: 5
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -4188,8 +4190,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\uC88C\uD074\uB9AD : \uD074\uB9AD \uB300\uC0C1\uC73C\uB85C \uC774\uB3D9\n\uC88C\uD074\uB9AD+\uB4DC\uB798\uADF8
-    : \uC774\uB3D9\n\uC6B0\uD074\uB9AD+\uB4DC\uB798\uADF8 : \uD68C\uC804\n\uAC80\uC0C9
-    \uD544\uD130\uB9C1, \uC0C1\uD0DC \uD544\uD130\uB9C1 \uAC00\uB2A5"
+    : \uC774\uB3D9\n\uC6B0\uD074\uB9AD+\uB4DC\uB798\uADF8 : \uD68C\uC804\n\uB9C8\uC6B0\uC2A4
+    \uD720 : \uC90C \uC778/\uC544\uC6C3\n\uAC80\uC0C9 \uD544\uD130\uB9C1, \uC0C1\uD0DC
+    \uD544\uD130\uB9C1 \uAC00\uB2A5"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b2c4b4460c734e746aee625aa2446904, type: 2}
   m_sharedMaterial: {fileID: -626693374993065104, guid: b2c4b4460c734e746aee625aa2446904, type: 2}
