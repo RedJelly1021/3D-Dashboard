@@ -64,9 +64,12 @@ public class Zone : MonoBehaviour
         _renderer.SetPropertyBlock(_mpb);
     }
 
-    // On Mouse Down(), if there collider, automatically registers click event
-    private void OnMouseDown()
+    // On Mouse Up(), if there collider, automatically registers click event
+    private void OnMouseUpAsButton()
     {
+        // if is dragging, do not trigger click event
+        if (CameraController.Instance.IsDragging) return;
+
         ZoneManager.Instance.OnZoneClicked(this);
     }
 }

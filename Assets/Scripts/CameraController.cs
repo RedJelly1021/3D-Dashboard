@@ -21,6 +21,15 @@ public class CameraController : MonoBehaviour
     private Coroutine _transitionRoutine;
     private GameObject _tempTargetObj;
 
+    [Header("Panning")]
+    public float panSpeed = 0.02f; // per pixel panning distance
+    public float dragThreshold = 5f; // minimum drag distance to start panning
+    public bool IsDragging { get; private set; }
+
+    private Vector3 _panOffset = Vector3.zero;
+    private Vector3 _lastPanMouse, _panStartMouse;
+    private bool _panArmed; // start left click outside UI?
+
     void Awake() => Instance = this;
 
     private void Start()
@@ -33,6 +42,8 @@ public class CameraController : MonoBehaviour
     {
         bool isOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
 
+        HandlePanInput(isOverUI);
+
         if(!isOverUI)
         {
             HandleRotationInput();
@@ -43,11 +54,11 @@ public class CameraController : MonoBehaviour
 
         if (_currentTarget == null) return;
 
+        Vector3 pivot = _currentTarget.position + _panOffset;
         Quaternion rot = Quaternion.Euler(_pitch, _yaw, 0);
-        Vector3 pos = _currentTarget.position - rot * Vector3.forward * _distance;
 
-        transform.position = pos;
-        transform.LookAt(_currentTarget);
+        transform.position = pivot - rot * Vector3.forward * _distance;
+        transform.LookAt(pivot);
     }
 
     void HandleRotationInput()
@@ -72,6 +83,43 @@ public class CameraController : MonoBehaviour
     {
         _distance -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
         _distance = Mathf.Clamp(_distance, 5f, 40f);
+    }
+
+    void HandlePanInput(bool isOverUI)
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            _panArmed = !isOverUI; // only arm if not over UI
+            IsDragging = false; // reset dragging state
+            _panStartMouse = _lastPanMouse = Input.mousePosition;
+        }
+
+        if (!_panArmed) return;
+
+        if (Input.GetMouseButton(0))
+        {
+            if (!IsDragging && (Input.mousePosition - _panStartMouse).magnitude > dragThreshold)
+                IsDragging = true;
+
+            if (IsDragging)
+            {
+                Vector3 delta = Input.mousePosition - _lastPanMouse;
+
+                // move based on floor(xz) plane : camera's right + forward horizontal direction
+                Vector3 right = transform.right;
+                Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+
+                // move more when the zoom is far away, proportional to distance
+                float scale = panSpeed * (_distance / defaultDistance); 
+                _panOffset -= (right * delta.x + forward * delta.y) * scale;
+            }
+            _lastPanMouse = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            _panArmed = false;
+        }
     }
 
     void HandleEscInput()
@@ -111,7 +159,8 @@ public class CameraController : MonoBehaviour
     private IEnumerator TransitionTo(Transform newTarget, float newDistance)
     {
         float elapsed = 0f;
-        Vector3 startPos = _currentTarget != null ? _currentTarget.position : newTarget.position;
+        Vector3 startPos = (_currentTarget != null ? _currentTarget.position : newTarget.position) + _panOffset;
+        _panOffset = Vector3.zero; // reset pan offset during transition
         float startDistance = _distance;
 
         // during transition, create temporary target object to interpolate position
