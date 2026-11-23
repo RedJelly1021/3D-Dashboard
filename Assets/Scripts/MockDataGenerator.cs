@@ -19,19 +19,25 @@ public class MockDataGenerator : MonoBehaviour
 
     void GenerateAndBroadcast()
     {
-        foreach (var zone in ZoneManager.Instance.Zones) 
+        foreach (var zone in ZoneManager.Instance.Zones)
         {
             // create natural transitions with sine waves and noise
             // The key point is each zone is offset by zoneId.GetHashCode(), so not all zones appear to have same value at same time   
-            float t = Time.time + zone.zoneId.GetHashCode() % 100;
+            // change  zone id to int (e.g., using GetHashCode)
+            int zoneIdInt = zone.zoneId.GetHashCode() % 100;
+            float t = Time.time + zoneIdInt;
             float baseValue = 25f + Mathf.Sin(t * 0.1f) * 10f;
-            float noise = Random.Range(-3f, 3f);
+
+            float noiseMin = -1f * Mathf.Abs(zoneIdInt);
+            float noiseMax = Mathf.Abs(zoneIdInt);
+            float noise = Random.Range(noiseMin, noiseMax);
+
             float value = baseValue + noise;
 
             ZoneStatus status = value switch
             {
-                < 22f => ZoneStatus.Normal,
-                < 32f => ZoneStatus.Warning,
+                < 30f => ZoneStatus.Normal,
+                < 60f => ZoneStatus.Warning,
                 _ => ZoneStatus.Critical,
             };
 
